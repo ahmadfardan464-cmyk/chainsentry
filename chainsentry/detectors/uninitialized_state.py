@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 
 from chainsentry.detectors.base import Detector
-from chainsentry.scanner import Finding
+from chainsentry.models import Finding
 
 
 # State vars are declared at contract scope (not inside function bodies).

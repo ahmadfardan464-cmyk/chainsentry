@@ -22,6 +22,8 @@ from chainsentry.detectors import (
     default_visibility,
     floating_pragma,
     uninitialized_state,
+    delegatecall_storage,
+    missing_zero_address,
 )
 
 ALL_DETECTORS: list[Detector] = [
@@ -35,6 +37,8 @@ ALL_DETECTORS: list[Detector] = [
     default_visibility.DefaultVisibilityDetector(),
     floating_pragma.FloatingPragmaDetector(),
     uninitialized_state.UninitializedStateDetector(),
+    delegatecall_storage.DelegatecallStorageDetector(),
+    missing_zero_address.MissingZeroAddressDetector(),
 ]
 
 __all__ = ["ALL_DETECTORS", "Detector"]

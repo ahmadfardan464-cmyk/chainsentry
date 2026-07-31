@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+env/
+
+# chainsentry output
+docs/demo-report.md
+*.chainsentry.json
+chainsentry-*.tar.gz
+
+# Solidity
+node_modules/
+artifacts/
+cache/
+out/
+broadcast/
+forge-cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Secrets / env
+.env
+.env.local
+*.pem
+*.key
+secrets.yaml
+
+# Logs
+*.log
+logs/
+
+# Disk-heavy
+*.zip
+*.tar.gz
+*.tar
+.cache/

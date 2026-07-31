@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 
 from chainsentry.detectors.base import Detector
-from chainsentry.scanner import Finding
+from chainsentry.models import Finding
 
 
 # Heuristic: inside a function, an external call (.call, .send, .transfer,

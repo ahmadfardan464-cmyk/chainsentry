@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 
 from chainsentry.detectors.base import Detector
-from chainsentry.scanner import Finding
+from chainsentry.models import Finding
 
 
 # Match block.timestamp or now when used in a comparison or arithmetic.

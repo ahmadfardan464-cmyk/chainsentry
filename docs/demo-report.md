@@ -1,7 +1,7 @@
 # chainsentry report — `contracts/vulnerable.sol`
 
-**Detectors run:** 10  
-**Duration:** 5 ms  
+**Detectors run:** 12  
+**Duration:** 4 ms  
 **Findings:** 11
 
 ## Severity breakdown

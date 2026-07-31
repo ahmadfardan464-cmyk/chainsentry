@@ -43,7 +43,6 @@ def test_vulnerable_contract_flags_unsigned_pragma():
 
 def test_safe_contract_low_finding_count():
     report = scan_file(CONTRACTS / "safe.sol")
-    # safe.sol uses pinned 0.8.24 and Ownable — should not trigger most detectors.
     high = [f for f in report.findings if f.severity in ("high", "critical")]
     assert not high, f"expected no high-severity findings on safe.sol, got: {high}"
 
@@ -51,6 +50,12 @@ def test_safe_contract_low_finding_count():
 def test_safe_contract_no_reentrancy():
     report = scan_file(CONTRACTS / "safe.sol")
     assert not any(f.detector == "reentrancy" for f in report.findings)
+
+
+def test_detector_count_is_twelve():
+    """After M2 expansion, 12 detectors should be registered."""
+    from chainsentry.detectors import ALL_DETECTORS
+    assert len(ALL_DETECTORS) >= 12, f"expected >=12 detectors, got {len(ALL_DETECTORS)}"
 
 
 def test_empty_source_no_findings():

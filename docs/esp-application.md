@@ -2,11 +2,11 @@
 
 > **Project:** chainsentry — Lightweight, zero-install smart contract static analyzer
 > **Track:** Open-source public-good tooling
-> **Applicant:** <applicant name> (background: security research, bug bounty, Python)
+> **Applicant:** Ahmad Fardan (background: security research, bug bounty, Python)
 > **Date:** 2026-07-31
-> **Status:** PoC complete (10 detectors, STL-only Python, demo report generated)
-> **Link to PoC:** https://github.com/<org>/chainsentry
-> **Ask:** $100,000 USDT-eq (paid in stETH), milestone-based, ~5 months
+> **Status:** PoC complete (12 detectors, stdlib-only Python, demo report generated)
+> **Link to PoC:** https://github.com/ahmadfardan/chainsentry
+> **Ask:** $100,000 USD-eq (paid in stETH), milestone-based, ~5 months
 
 ---
 
@@ -16,8 +16,9 @@ Build and ship **chainsentry**, a zero-install static analyzer that finds
 the most common Solidity vulnerability classes (reentrancy, tx.origin,
 timestamp dependence, unchecked calls, access control, integer overflow,
 unsafe randomness, default visibility, floating pragma, uninitialized
-state) in <100 ms on contracts under 1k lines, with structured reports
-that **non-Solidity reviewers can act on**.
+state, delegatecall storage, missing zero-address) in <100 ms on contracts
+under 1k lines, with structured reports that **non-Solidity reviewers
+can act on**.
 
 chainsentry is the pre-commit hook. Slither, Mythril, and Echidna remain
 the CI gate. The two are complementary: chainsentry catches the easy wins
@@ -44,7 +45,7 @@ fast, the heavy tools handle the deep analysis.
 | **Slither** | Deep static analysis, 90+ detectors | Needs solc, slow first-run, output is Slither-internal — requires Solidity knowledge to read |
 | **Mythril** | Symbolic execution, deep paths | Slow, requires EVM, false-positive heavy |
 | **Echidna** | Property-based fuzzing | Setup cost, requires Solidity tests, not a static check |
-| **chainsentry** | Pre-commit friction-free scan, plain-English report | Pre-0.9 era depth — catches the common 10, not the exotic 90 |
+| **chainsentry** | Pre-commit friction-free scan, plain-English report | Pre-0.9 era depth — catches the common 12, not the exotic 90 |
 
 chainsentry does not replace Slither. It runs *before* Slither in the
 contributor's local loop and surfaces the obvious wins, so Slither's CI
@@ -52,16 +53,15 @@ run focuses on the deeper findings.
 
 ## Deliverables
 
-### M1 — PoC (current, complete)
-- 10 detectors, stdlib-only Python, CLI + JSON/Markdown/text reporters
-- Demo contracts: `vulnerable.sol` (10 seeded issues) + `safe.sol` (clean)
-- Smoke tests in `tests/test_scanner.py`
+### M1 — PoC (current, complete) ✅
+- 12 detectors, stdlib-only Python, CLI + JSON/Markdown/text reporters
+- Demo contracts: `contracts/vulnerable.sol` (11 seeded issues) + `contracts/safe.sol` (clean)
+- Smoke tests in `tests/test_scanner.py` (9/9 pass)
 - ~7 days of work, single contributor
 
 ### M2 — Production-ready (4 weeks, $30K)
-- Detector suite grows to 25+ (add: delegatecall storage layout, signature
-  replay, ERC-20 approval race, gas griefing, hardcoded addresses, missing
-  zero-address checks, ERC-777 callbacks, ...)
+- Detector suite grows to 25+ (add: signature replay, ERC-20 approval
+  race, gas griefing, hardcoded addresses, ERC-777 callbacks, ...)
 - Solidity AST parser plugin (uses `slither-analyzer` if available, falls
   back to text mode) — hardening for >5k-line contracts
 - GitHub Action with `--sarif` output for Code Scanning integration
@@ -69,8 +69,8 @@ run focuses on the deeper findings.
   ground-truth labels, per-detector precision/recall published per release
 
 ### M3 — Web UI + community (4 weeks, $30K)
-- Paste-a-contract web app (no install, no signup, runs entirely in
-  browser thanks to Pyodide or a small Flask backend)
+- Paste-a-contract web app (`web/app.py`, Flask, stdlib only) — no install,
+  no signup, runs entirely in browser via pyodide or a small Flask backend
 - Public detector registry: anyone can submit a new detector as a
   pull request, run against the benchmark, see precision/recall delta
 - Documentation site with per-detector explanations, GIF demonstrations,
@@ -91,12 +91,14 @@ run focuses on the deeper findings.
 
 ## Team
 
-**<applicant name>, lead engineer**
+**Ahmad Fardan, lead engineer**
 - Background: security research, bug bounty (multiple resolved findings
   on HackerOne platforms), Python tooling, smart contract basics
 - Time commitment: full-time on chainsentry for 5 months
-- GitHub profile: <link>
-- Past grants / work: <link if available, else note "first ESP grant">
+- GitHub: https://github.com/ahmadfardan
+- Email: ahmadfardan464@gmail.com
+- Telegram: @AhmadFardan
+- Past grants / work: first ESP grant
 
 **Optional collaborators (post-M1):**
 - 1 Solidity reviewer (part-time, ~10 hrs/week, $0 rate but listed as
@@ -112,7 +114,7 @@ the applicant wanted before becoming the tool the applicant is building.
 ## Open-source posture
 
 - **License:** MIT (already added; compatible with downstream OSS use)
-- **Repo:** will be public from day one of M1
+- **Repo:** public from day one of M1
 - **Issue tracker:** public GitHub Issues
 - **Roadmap:** public ROADMAP.md, updated monthly
 - **Contributions:** CONTRIBUTING.md with detector-spec template
@@ -122,7 +124,7 @@ the applicant wanted before becoming the tool the applicant is building.
 
 | Metric | M1 (poC) | M2 | M3 | M4 |
 |---|---|---|---|---|
-| Detectors | 10 | 25 | 30 | 30+ |
+| Detectors | 12 | 25 | 30 | 30+ |
 | Public corpus | 2 | 50 | 200 | 200+ |
 | Detector precision (median) | n/a | 0.85 | 0.90 | 0.92 |
 | GitHub stars | 0 | 100 | 500 | 1,500 |
@@ -156,16 +158,29 @@ the applicant wanted before becoming the tool the applicant is building.
 
 ## Contact
 
-- GitHub: <link>
-- Email: <email>
-- Telegram: <handle>
-- Farcaster: <handle>
+- GitHub: https://github.com/ahmadfardan
+- Email: ahmadfardan464@gmail.com
+- Telegram: @AhmadFardan
+- Project: https://github.com/ahmadfardan/chainsentry
 
 ---
 
-## Appendix A — Detector reference (current)
+## Appendix A — Detector reference (current 12)
 
 (rendered by `python3 -m chainsentry --list-detectors`)
+
+1. `reentrancy` (high)
+2. `tx-origin` (high)
+3. `timestamp-dependence` (medium)
+4. `unchecked-call` (medium)
+5. `missing-access-control` (high)
+6. `integer-overflow` (medium)
+7. `unsafe-randomness` (medium)
+8. `default-visibility` (low)
+9. `floating-pragma` (low)
+10. `uninitialized-state` (low)
+11. `delegatecall-storage` (high)
+12. `missing-zero-address` (medium)
 
 ## Appendix B — Demo report
 
@@ -176,8 +191,23 @@ the applicant wanted before becoming the tool the applicant is building.
 
 ```
 $ python3 -m chainsentry contracts/vulnerable.sol -f text
-contracts/vulnerable.sol: 10 findings (10 detectors, 1 ms)
-  🛑 HIGH    L18   [reentrancy] Function `withdraw` makes an external call before a state change — expose to reentrancy.
-  🔴 HIGH    L14   [tx-origin] `tx.origin` used — phishable via malicious intermediate contract.
+contracts/vulnerable.sol: 11 findings (12 detectors, 3 ms)
+  🔴 high   L3   [reentrancy] Function `withdraw` makes an external call before a state change — expose to reentrancy.
+  🔴 high   L20  [missing-access-control] Privileged function `transferOwnership` lacks an access-control modifier (onlyOwner, etc.).
+  🔴 high   L21  [tx-origin] `tx.origin` used — phishable via malicious intermediate contract.
+  🟠 medium L5   [integer-overflow] Contract compiles with Solidity ^0.7.6 (<0.8) — no built-in overflow check.
   ...
 ```
+
+## Appendix D — Web UI
+
+`web/app.py` runs a Flask server (stdlib-only Flask, no native deps) that
+exposes chainsentry via a paste-and-scan web interface. Run with:
+
+```bash
+cd /home/user/workspace/chainsentry
+python3 -m web.app
+# Open http://localhost:5000
+```
+
+Screenshot to be added in M3.

@@ -3,10 +3,11 @@
 Lightweight, **zero-install** smart contract static analyzer — find common
 Solidity vulnerabilities before they ship.
 
-> **Status:** PoC. 10 detectors across reentrancy, tx.origin, timestamp
+> **Status:** PoC. 12 detectors across reentrancy, tx.origin, timestamp
 > dependence, unchecked calls, access control, integer overflow, unsafe
-> randomness, default visibility, floating pragma, and uninitialized state.
-> Stdlib-only Python. Runs in <100 ms on contracts under 1k lines.
+> randomness, default visibility, floating pragma, uninitialized state,
+> delegatecall storage, and missing zero-address check.
+> Stdlib-only Python. Runs in <10 ms on contracts under 1k lines.
 
 ## Why
 
@@ -22,6 +23,8 @@ fast pre-commit check, Slither is the deep CI gate.
 
 ## Quick start
 
+### CLI
+
 ```bash
 # Run on a single file
 python3 -m chainsentry contracts/vulnerable.sol -f text
@@ -36,7 +39,17 @@ python3 -m chainsentry contracts/ --fail-on high
 python3 -m chainsentry --list-detectors
 ```
 
-No `pip install` required. Stdlib only. Python 3.8+.
+No `pip install` required for the CLI. Stdlib only. Python 3.8+.
+
+### Web UI
+
+```bash
+python3 -m web.app
+# Open http://127.0.0.1:5000
+```
+
+A small Flask app (Flask is the only non-stdlib dep, optional). Paste a
+contract, get a markdown report in the browser. See `web/README.md`.
 
 ## Detectors
 
@@ -52,6 +65,8 @@ No `pip install` required. Stdlib only. Python 3.8+.
 | `default-visibility` | low | Default function visibility |
 | `floating-pragma` | low | Floating pragma |
 | `uninitialized-state` | low | Uninitialized state variable |
+| `delegatecall-storage` | high | Unchecked delegatecall storage layout |
+| `missing-zero-address` | medium | Missing zero-address check on assignment |
 
 Each detector emits a `Finding` with: line, column, snippet, severity,
 plain-English message, fix recommendation, and references to SWC registry
@@ -61,28 +76,26 @@ plain-English message, fix recommendation, and references to SWC registry
 
 ```bash
 $ python3 -m chainsentry contracts/vulnerable.sol -f text
-contracts/vulnerable.sol: 10 findings (10 detectors, 1 ms)
-  🛑 HIGH    L18   [reentrancy] Function `withdraw` makes an external call before a state change — expose to reentrancy.
-  🔴 HIGH    L14   [tx-origin] `tx.origin` used — phishable via malicious intermediate contract.
+contracts/vulnerable.sol: 11 findings (12 detectors, 3 ms)
+  🔴 high   L3   [reentrancy] Function `withdraw` makes an external call before a state change — expose to reentrancy.
+  🔴 high   L20  [missing-access-control] Privileged function `transferOwnership` lacks an access-control modifier (onlyOwner, etc.).
+  🔴 high   L21  [tx-origin] `tx.origin` used — phishable via malicious intermediate contract.
   ...
 ```
 
 See `docs/detectors.md` for the full reference.
 
-## Roadmap (post-grant)
+## Roadmap
 
-- **M1 (current):** Core PoC + 10 detectors + CLI + JSON/Markdown/text reporters
-- **M2:** Web UI (paste contract → scan → report), GitHub Action, `--sarif` output
-- **M3:** 25 detectors, Solidity AST parser (slither-analyzer optional), webhook integration
-- **M4:** Public launch, browser extension (Etherscan inline scan), community rule registry
+- **M1 (current):** Core PoC + 12 detectors + CLI + JSON/Markdown/text reporters + web UI ✅
+- **M2:** 25 detectors, Solidity AST parser (slither-analyzer optional), GitHub Action with `--sarif` output
+- **M3:** Public detector registry, browser extension (Etherscan inline scan), community submissions
+- **M4:** HackerOne/Cantina/Code4rena export, conference talks, benchmark report
 
-## Why this fits the Ethereum Foundation ESP
+## Funding
 
-- **Public good, open-source:** every detector is Apache-2.0, every report is reproducible
-- **Ecosystem benefit:** reduces the supply-chain risk of insecure Solidity landing in mainnet
-- **Complementary, not duplicative:** Slither/Mythril remain authoritative for deep analysis
-- **Low barrier:** teams without Solidity expertise can run scans and read the report
-- **Measurable impact:** detector-precision tracked on a public benchmark corpus
+Submitted to Ethereum Foundation ESP — see `docs/esp-application.md`.
+$100K ask, milestone-based, public open-source license (MIT).
 
 ## License
 

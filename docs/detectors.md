@@ -4,12 +4,14 @@ Each detector maps to one or more SWC entries and a CWE. Patterns are
 pure-text regex/AST-lite on Solidity source — no solc, no slither, no
 mythril required.
 
+---
+
 ## `reentrancy` — high
 
 **Pattern:** within a function body, an external call
 (`.call/.send/.transfer/.delegatecall` or `address(...).call(...)`)
 appears *before* a state-changing assignment (`x = ...`, `delete`,
-`selfdestruct`).
+`selfdestruct`, `+=`, `-=`, etc.).
 
 **Why it matters:** classic reentrancy — the attacker re-enters the
 function before the state update lands, draining repeatedly.
@@ -132,3 +134,33 @@ for libraries and examples, not for deployed code.
 **Fix:** initialize in the declaration or in the constructor.
 
 **References:** SWC-109.
+
+## `delegatecall-storage` — high
+
+**Pattern:** `.delegatecall(...)` without a nearby guard comment
+mentioning storage layout or a known proxy slot.
+
+**Why it matters:** delegatecall runs the callee's code in the caller's
+storage. The Parity multi-sig 2017 incident and several recent
+upgradeability incidents traced back to this pattern.
+
+**Fix:** use the EIP-1967 proxy pattern (storage slot 0x360894... for
+implementation). For libraries, use `using ... for ...` instead of
+raw delegatecall. Add a comment naming the expected storage layout.
+
+**References:** SWC-112, CWE-829.
+
+## `missing-zero-address` — medium
+
+**Pattern:** function taking `address _x` and assigning it to a state
+variable without a `require(_x != address(0))` guard.
+
+**Why it matters:** setting an owner / oracle / treasury to
+`0x0000...0000` often bricks the contract or makes it unrecoverable.
+
+**Fix:** `require(_param != address(0), "zero address");` before any
+state-write that uses the parameter. OpenZeppelin's `Address` library
+has helpers (`Address.isContract`) if you also need to assert the
+address is a contract.
+
+**References:** SWC-128, CWE-20.

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>chainsentry — smart contract static analyzer</title>
+  <style>
+    :root {
+      --bg: #0f1216;
+      --panel: #161a22;
+      --border: #2a313c;
+      --fg: #d7dde6;
+      --muted: #8a93a3;
+      --accent: #6dd1e9;
+      --critical: #ff6b6b;
+      --high: #ff6b6b;
+      --medium: #ffae5e;
+      --low: #f7d06b;
+      --info: #7faaf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", monospace;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+    }
+    header {
+      padding: 1.2rem 1.6rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    header .tag {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      min-height: calc(100vh - 60px);
+    }
+    .pane {
+      padding: 1rem 1.4rem;
+      overflow: auto;
+    }
+    .pane + .pane {
+      border-left: 1px solid var(--border);
+    }
+    textarea {
+      width: 100%;
+      height: calc(100vh - 200px);
+      background: var(--panel);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.8rem;
+      font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+    .actions {
+      margin-top: 0.8rem;
+      display: flex;
+      gap: 0.6rem;
+    }
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: 0;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.1); }
+    button.secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+    }
+    pre.report {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem;
+      white-space: pre-wrap;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+    pre.report h1 { font-size: 1.05rem; color: var(--accent); margin-top: 0; }
+    pre.report h2 { font-size: 0.92rem; color: var(--accent); margin-top: 1.2rem; }
+    pre.report h3 { font-size: 0.85rem; margin-top: 0.9rem; }
+    pre.report code { background: rgba(255,255,255,0.05); padding: 0 0.3em; border-radius: 2px; }
+    pre.report blockquote, pre.report hr { color: var(--border); }
+    .empty {
+      color: var(--muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+    /* severity emoji-like colors */
+    .sev-critical, .sev-high { color: var(--high); }
+    .sev-medium { color: var(--medium); }
+    .sev-low { color: var(--low); }
+    .sev-info { color: var(--info); }
+    footer {
+      padding: 0.6rem 1.4rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+      background: var(--panel);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>chainsentry</h1>
+    <span class="tag">lightweight smart contract static analyzer</span>
+    <span class="tag" style="margin-left:auto">paste a contract → scan</span>
+  </header>
+
+  <main>
+    <form class="pane" method="POST" action="/scan">
+      <label for="source" style="display:block;margin-bottom:0.5rem;color:var(--muted);font-size:0.85rem">
+        Solidity source
+      </label>
+      <textarea id="source" name="source" placeholder="// SPDX-License-Identifier: MIT&#10;pragma solidity 0.8.24;&#10;&#10;contract Vault {&#10;    mapping(address => uint256) public balances;&#10;    ...&#10;}" spellcheck="false">{{ source|e }}</textarea>
+      <div class="actions">
+        <button type="submit">Scan</button>
+        <a href="/" class="secondary" style="text-decoration:none;padding:0.5rem 1rem;border-radius:4px;border:1px solid var(--border);color:var(--fg)">Clear</a>
+      </div>
+    </form>
+
+    <div class="pane">
+      {% if report %}
+        <pre class="report">{{ report|e }}</pre>
+      {% else %}
+        <div class="empty">Report will appear here.</div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    chainsentry · zero install · stdlib only · <a href="https://github.com/ahmadfardan/chainsentry" style="color:var(--accent)">github</a>
+  </footer>
+</body>
+</html>
