@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chainsentry"
+version = "0.1.0"
+description = "Lightweight, zero-install smart contract static analyzer"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [{name = "chainsentry contributors"}]
+keywords = ["ethereum", "solidity", "security", "static-analysis"]
+
+[project.scripts]
+chainsentry = "chainsentry.cli:main"
+
+[tool.setuptools]
+packages = ["chainsentry", "chainsentry.detectors"]

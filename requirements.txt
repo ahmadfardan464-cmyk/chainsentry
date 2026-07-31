@@ -1,0 +1,2 @@
+# chainsentry is stdlib-only — no third-party dependencies required.
+# This file is intentionally empty and kept for tooling compatibility.
