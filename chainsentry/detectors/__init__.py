@@ -12,6 +12,7 @@ from chainsentry.detectors import delegatecall_storage
 from chainsentry.detectors import ether_frozen
 from chainsentry.detectors import floating_pragma
 from chainsentry.detectors import integer_overflow
+from chainsentry.detectors import missing_event
 from chainsentry.detectors import missing_zero_address
 from chainsentry.detectors import reentrancy
 from chainsentry.detectors import selfdestruct
@@ -38,6 +39,7 @@ ALL_DETECTORS = [
     selfdestruct.SelfdestructDetector(),
     abi_encode_packed_collision.AbiEncodePackedCollisionDetector(),
     ether_frozen.EtherFrozenDetector(),
+    missing_event.MissingEventDetector(),
 ]
 
 

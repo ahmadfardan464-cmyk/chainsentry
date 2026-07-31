@@ -3,11 +3,11 @@
 Lightweight, **zero-install** smart contract static analyzer — find common
 Solidity vulnerabilities before they ship.
 
-> **Status:** PoC. 15 detectors across reentrancy, tx.origin, timestamp
+> **Status:** PoC. 16 detectors across reentrancy, tx.origin, timestamp
 > dependence, unchecked calls, access control, integer overflow, unsafe
 > randomness, default visibility, floating pragma, uninitialized state,
 > delegatecall storage, missing zero-address check, unprotected selfdestruct,
-> abi.encodePacked collisions, and ether-frozen contracts.
+> abi.encodePacked collisions, ether-frozen contracts, and missing event emit.
 > Stdlib-only Python. Runs in <10 ms on contracts under 1k lines.
 
 ## Why
@@ -74,6 +74,7 @@ contract, get a markdown report in the browser. See `web/README.md`.
 | `selfdestruct-unprotected` | high | Unprotected SELFDESTRUCT |
 | `abi-encode-packed-collision` | medium | abi.encodePacked multi-arg collision risk |
 | `ether-frozen` | low | Ether-frozen contract (no withdraw path) |
+| `missing-event` | low | State-mutating privileged function with no event emit |
 
 Each detector emits a `Finding` with: line, column, snippet, severity,
 plain-English message, fix recommendation, and references to SWC registry

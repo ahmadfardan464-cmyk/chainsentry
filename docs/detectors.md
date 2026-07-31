@@ -221,6 +221,27 @@ document the design and provide an admin override path.
 
 **References:** SWC-132, CWE-674.
 
+## `missing-event` — low
+
+**Pattern:** a state-modifying function whose name matches a
+privileged verb (`set*`, `transfer*`, `mint*`, `burn*`, `pause*`,
+`execute*`, `emergency*`, ...) and whose body contains no `emit `.
+Detected only when the contract declares or emits at least one
+event somewhere (otherwise the heuristic is too noisy on contracts
+that don't use events at all).
+
+**Why it matters:** off-chain monitors (subgraphs, indexers, governance
+dashboards, audit-trail tooling) rely on event emission for state
+observability. Functions that silently mutate state make incident
+detection slower and create audit-trail blind spots.
+
+**Fix:** add `event FooChanged(address indexed by, params...);` at the
+contract scope and `emit FooChanged(msg.sender, params)` at the end
+of the privileged function. Older event names can stay for back-compat;
+add a new `*Changed` event name to preserve logs going forward.
+
+**References:** SWC-135 (closest SWC), Solidity docs §events.
+
 ---
 
 ## How detectors are organized
