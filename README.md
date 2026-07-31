@@ -33,6 +33,9 @@ python3 -m chainsentry contracts/vulnerable.sol -f text
 # Markdown report
 python3 -m chainsentry contracts/ -f markdown -o report.md
 
+# SARIF (GitHub Code Scanning native)
+python3 -m chainsentry contracts/ -f sarif -o chainsentry.sarif
+
 # CI-friendly: fail on high/critical
 python3 -m chainsentry contracts/ --fail-on high
 

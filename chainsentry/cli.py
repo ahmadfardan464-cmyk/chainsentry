@@ -7,7 +7,7 @@ from pathlib import Path
 
 from chainsentry import __version__
 from chainsentry.scanner import scan_paths
-from chainsentry.reporters import to_json, to_markdown, to_text
+from chainsentry.reporters import to_json, to_markdown, to_sarif, to_text
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -18,7 +18,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("paths", nargs="+", help="One or more .sol files or directories.")
     p.add_argument(
         "-f", "--format",
-        choices=("text", "json", "markdown"),
+        choices=("text", "json", "markdown", "sarif"),
         default="text",
         help="Output format (default: text).",
     )
@@ -89,6 +89,8 @@ def main(argv: list[str] | None = None) -> int:
         out = to_json_multi(reports)
     elif args.format == "markdown":
         out = to_markdown(reports)
+    elif args.format == "sarif":
+        out = to_sarif(reports)
     else:
         out = to_text(reports)
 
