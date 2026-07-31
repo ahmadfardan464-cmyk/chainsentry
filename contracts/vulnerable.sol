@@ -58,4 +58,17 @@ contract VulnerableBank {
     function emergencyDrain() {
         payable(owner).transfer(address(this).balance);
     }
+
+    // SELFDESTRUCT UNPROTECTED — no onlyOwner
+    function destroy() public {
+        selfdestruct(payable(owner));
+    }
+
+    // ETHER FROZEN — receive() but no withdraw function
+    receive() external payable {}
+
+    function sweep() public {
+        // intentionally no transfer/send path → ether-frozen detector should flag
+        owner = msg.sender;
+    }
 }

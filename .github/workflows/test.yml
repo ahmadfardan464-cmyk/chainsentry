@@ -1,0 +1,37 @@
+name: chainsentry tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Run smoke tests
+        run: |
+          python3 tests/test_scanner.py
+      - name: List detectors
+        run: |
+          python3 -m chainsentry --list-detectors
+      - name: Scan vulnerable.sol (text)
+        run: |
+          python3 -m chainsentry contracts/vulnerable.sol -f text
+      - name: Scan safe.sol (no findings expected)
+        run: |
+          python3 -m chainsentry contracts/safe.sol -f text
+      - name: Generate markdown demo report
+        run: |
+          python3 -m chainsentry contracts/vulnerable.sol -f markdown -o /tmp/demo.md
+          cat /tmp/demo.md

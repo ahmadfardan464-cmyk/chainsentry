@@ -1,32 +1,28 @@
-"""Detector registry.
+"""chainsentry detectors — each class subclasses Detector; ALL_DETECTORS holds instances.
 
-Add a new detector by:
-1. Creating a class that subclasses `Detector`
-2. Adding it to ALL_DETECTORS below
-
-Detectors are pure functions over source text. They must not import
-solc, slither, or any heavy dependency — they run on raw `.sol` source
-to keep the PoC zero-install.
+Detector registry pattern: `from chainsentry.detectors import <module>; <module>.<ClassName>()`.
+ALL_DETECTORS is the canonical list passed to the scanner.
 """
 from __future__ import annotations
 
-from chainsentry.detectors.base import Detector
-from chainsentry.detectors import (
-    reentrancy,
-    tx_origin,
-    timestamp,
-    unchecked_call,
-    access_control,
-    integer_overflow,
-    unsafe_randomness,
-    default_visibility,
-    floating_pragma,
-    uninitialized_state,
-    delegatecall_storage,
-    missing_zero_address,
-)
+from chainsentry.detectors import abi_encode_packed_collision
+from chainsentry.detectors import access_control
+from chainsentry.detectors import default_visibility
+from chainsentry.detectors import delegatecall_storage
+from chainsentry.detectors import ether_frozen
+from chainsentry.detectors import floating_pragma
+from chainsentry.detectors import integer_overflow
+from chainsentry.detectors import missing_zero_address
+from chainsentry.detectors import reentrancy
+from chainsentry.detectors import selfdestruct
+from chainsentry.detectors import timestamp
+from chainsentry.detectors import tx_origin
+from chainsentry.detectors import unchecked_call
+from chainsentry.detectors import uninitialized_state
+from chainsentry.detectors import unsafe_randomness
 
-ALL_DETECTORS: list[Detector] = [
+
+ALL_DETECTORS = [
     reentrancy.ReentrancyDetector(),
     tx_origin.TxOriginDetector(),
     timestamp.TimestampDependenceDetector(),
@@ -39,6 +35,10 @@ ALL_DETECTORS: list[Detector] = [
     uninitialized_state.UninitializedStateDetector(),
     delegatecall_storage.DelegatecallStorageDetector(),
     missing_zero_address.MissingZeroAddressDetector(),
+    selfdestruct.SelfdestructDetector(),
+    abi_encode_packed_collision.AbiEncodePackedCollisionDetector(),
+    ether_frozen.EtherFrozenDetector(),
 ]
 
-__all__ = ["ALL_DETECTORS", "Detector"]
+
+__all__ = ["ALL_DETECTORS"]

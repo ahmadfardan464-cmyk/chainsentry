@@ -164,3 +164,73 @@ has helpers (`Address.isContract`) if you also need to assert the
 address is a contract.
 
 **References:** SWC-128, CWE-20.
+
+## `selfdestruct-unprotected` — high
+
+**Pattern:** `selfdestruct(...)` call inside a function whose declaration
+lacks `onlyOwner` / `onlyRole` / `restricted` / similar access-control
+modifier.
+
+**Why it matters:** any external caller can permanently destroy the
+contract and drain its stored ETH balance. Real-world impact includes
+the Gox-style coin drain + DoS of dependent systems that expect the
+contract address to persist.
+
+**Fix:** restrict `selfdestruct` to a privileged function
+(`onlyOwner` / `onlyRole`) and add a deprecation / migration guard.
+Note EIP-6780 (post-Dencun `SELFDESTRUCT` semantics) before relying on
+the keyword alone — under EIP-6780, `selfdestruct` only destructs when
+called in the same transaction as the contract creation, otherwise
+it just sends the balance.
+
+**References:** SWC-106, CWE-284, EIP-6780.
+
+## `abi-encode-packed-collision` — medium
+
+**Pattern:** `abi.encodePacked(...)` called with two or more arguments,
+and at least one dynamic-length type (`string`, `bytes`, `[]`) or
+simply multiple adjacent fixed-type arguments with combined length
+non-multiple of 32.
+
+**Why it matters:** packed encoding does not frame field boundaries
+— `encodePacked("abc", "def")` and `encodePacked("abcd", "ef")` hash to
+the same value. Used as a unique signature or merkle-leaf key, an
+attacker can replay a signature meant for one input against another.
+
+**Fix:** use `abi.encode` (default mode) which pads each field to 32
+bytes and eliminates boundary ambiguity. If packed encoding is required
+(gas optimization), ensure arguments are fixed-length and homogeneously
+typed (e.g. all `bytes32`).
+
+**References:** SWC-133, CWE-1240, Solidity ABI docs §non-standard-packed-mode.
+
+## `ether-frozen` — low
+
+**Pattern:** contract declares `receive()` / `fallback()` or has a
+payable function, and the source contains no `withdraw` / `refund` /
+`payout` token (the heuristic greps for these alongside `transfer` /
+`send` / `call{value:`).
+
+**Why it matters:** ETH sent to the contract is at risk of being
+permanently locked. Can be intentional for vaults/reserves but is a
+common post-deployment accident.
+
+**Fix:** add an explicit `withdraw` / `refund` / `payout` function
+gated by appropriate access control. For intentional reserves,
+document the design and provide an admin override path.
+
+**References:** SWC-132, CWE-674.
+
+---
+
+## How detectors are organized
+
+- 15 detectors in `chainsentry/detectors/*.py`, each a `Detector` subclass.
+- `__init__.py` instantiates them in `ALL_DETECTORS`.
+- `scanner.py` dispatches each entry across the source and sorts findings
+  by severity desc, then line asc.
+- `reporters.py` formats findings as `text` / `json` / `markdown`.
+- `cli.py` is the argparse entrypoint (`python3 -m chainsentry <file>`).
+
+To add a new detector, follow `CONTRIBUTING.md` — pick an SWC, write a
+subclass, register it in `__init__.py`, append a test fixture, open a PR.
