@@ -87,6 +87,34 @@ def test_unchecked_arithmetic_snippet():
     assert findings[0].detector == "unchecked-arithmetic"
 
 
+def test_arbitrary_send_eth_registered():
+    """Detector 18 — flags unprotected ETH transfers to user-controlled addresses (SWC-114)."""
+    from chainsentry.detectors import ALL_DETECTORS
+    ids = {d.id for d in ALL_DETECTORS}
+    assert "arbitrary-send-eth" in ids, (
+        f"expected arbitrary-send-eth detector, got: {ids}"
+    )
+
+
+def test_arbitrary_send_eth_snippet():
+    """Standalone snippet — should fire on `withdraw(to)` that calls `to.transfer(...)` without onlyOwner."""
+    from chainsentry.detectors.arbitrary_send_eth import (
+        ArbitrarySendEthDetector,
+    )
+    src = (
+        "// SPDX-License-Identifier: MIT\n"
+        "pragma solidity ^0.8.20;\n"
+        "contract Vault {\n"
+        "    function withdraw(address to) external {\n"
+        "        to.transfer(address(this).balance);\n"
+        "    }\n"
+        "}\n"
+    )
+    findings = ArbitrarySendEthDetector().scan(src, src.splitlines())
+    assert findings, "expected arbitrary-send-eth to fire on `withdraw(to)` forwarding ETH"
+    assert findings[0].detector == "arbitrary-send-eth"
+
+
 def test_empty_source_no_findings():
     report = scan_file(CONTRACTS / "vulnerable.sol")  # existence check
     assert report.detector_count > 0

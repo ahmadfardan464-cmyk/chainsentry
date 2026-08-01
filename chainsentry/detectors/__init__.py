@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from chainsentry.detectors import abi_encode_packed_collision
 from chainsentry.detectors import access_control
+from chainsentry.detectors import arbitrary_send_eth
 from chainsentry.detectors import default_visibility
 from chainsentry.detectors import delegatecall_storage
 from chainsentry.detectors import ether_frozen
@@ -42,6 +43,7 @@ ALL_DETECTORS = [
     ether_frozen.EtherFrozenDetector(),
     missing_event.MissingEventDetector(),
     unchecked_arithmetic.UncheckedArithmeticDetector(),
+    arbitrary_send_eth.ArbitrarySendEthDetector(),
 ]
 
 
