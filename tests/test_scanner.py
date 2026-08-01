@@ -58,6 +58,35 @@ def test_detector_count_is_twelve():
     assert len(ALL_DETECTORS) >= 12, f"expected >=12 detectors, got {len(ALL_DETECTORS)}"
 
 
+def test_unchecked_arithmetic_registered():
+    """Detector 17 — flags arithmetic inside `unchecked { ... }` blocks in 0.8+."""
+    from chainsentry.detectors import ALL_DETECTORS
+    ids = {d.id for d in ALL_DETECTORS}
+    assert "unchecked-arithmetic" in ids, (
+        f"expected unchecked-arithmetic detector, got: {ids}"
+    )
+
+
+def test_unchecked_arithmetic_snippet():
+    """Standalone snippet — the detector should fire on `unchecked { x += 1; }`."""
+    from chainsentry.detectors.unchecked_arithmetic import (
+        UncheckedArithmeticDetector,
+    )
+    src = (
+        "// SPDX-License-Identifier: MIT\n"
+        "pragma solidity ^0.8.20;\n"
+        "contract C {\n"
+        "    uint256 public x;\n"
+        "    function bump() external {\n"
+        "        unchecked { x += 1; }\n"
+        "    }\n"
+        "}\n"
+    )
+    findings = UncheckedArithmeticDetector().scan(src, src.splitlines())
+    assert findings, "expected unchecked-arithmetic to fire on `unchecked { x += 1; }`"
+    assert findings[0].detector == "unchecked-arithmetic"
+
+
 def test_empty_source_no_findings():
     report = scan_file(CONTRACTS / "vulnerable.sol")  # existence check
     assert report.detector_count > 0

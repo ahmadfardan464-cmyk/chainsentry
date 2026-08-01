@@ -18,6 +18,7 @@ from chainsentry.detectors import reentrancy
 from chainsentry.detectors import selfdestruct
 from chainsentry.detectors import timestamp
 from chainsentry.detectors import tx_origin
+from chainsentry.detectors import unchecked_arithmetic
 from chainsentry.detectors import unchecked_call
 from chainsentry.detectors import uninitialized_state
 from chainsentry.detectors import unsafe_randomness
@@ -40,6 +41,7 @@ ALL_DETECTORS = [
     abi_encode_packed_collision.AbiEncodePackedCollisionDetector(),
     ether_frozen.EtherFrozenDetector(),
     missing_event.MissingEventDetector(),
+    unchecked_arithmetic.UncheckedArithmeticDetector(),
 ]
 
 
